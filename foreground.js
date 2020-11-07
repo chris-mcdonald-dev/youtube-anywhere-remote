@@ -3,7 +3,6 @@ if (!window.scriptInjected) {
 
     console.log('Script has been injected')
 
-    player = document.getElementById('logo-red-icon-container');
     console.log(player)
     // Chrome lists Keyboard shortcuts in alphabetical order.
     shortcuts = {
@@ -22,6 +21,5 @@ if (!window.scriptInjected) {
         console.log("Message received: ", request.message)
         // Uses incoming message as a dynamic key to dispatch keypress
         document.dispatchEvent(shortcuts[request.message]);
-        // player.click();
     })
 }
