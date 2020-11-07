@@ -1,0 +1,44 @@
+{
+    "manifest_version": 2,
+    "name": "Youtube Anywhere Remote",
+    "version": "0.1.0",
+    "background": {
+        "scripts": ["./background.js"]
+    },
+    "options_page": "./options.html",
+    "browser_action": {
+        "default_popup": "popup.html"
+    },
+    "permissions": [
+        "tabs",
+        "https://www.youtube.com/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "http://*.youtube.com/watch*"
+            ],
+            "js": ["foreground.js"]
+        }
+    ],
+    "commands": {
+        "aPausePlay": {
+            "description": "Pause/Play"
+        },
+        "bRewind": {
+          "description": "Rewind"
+        },
+        "cFastforward": {
+            "description": "Fastforward"
+        },
+        "fNextVideo": {
+            "description": "Next Video"
+        },
+        "hSpeedUp": {
+            "description": "Speed Up"
+        },
+        "iSlowDown": {
+            "description": "Slow Down"
+        }
+      }
+}
