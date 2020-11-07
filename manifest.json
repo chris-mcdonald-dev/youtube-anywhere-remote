@@ -1,6 +1,6 @@
 {
     "manifest_version": 2,
-    "name": "Youtube Anywhere Remote",
+    "name": "YouTube Anywhere Remote",
     "version": "0.1.0",
     "icons": {
         "16": "assets/icon-16.png",
