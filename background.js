@@ -34,19 +34,19 @@ function start() {
     commandHandler();
 }
 
-// Initiates command listener
+// Initiates sequence
 start();
 
 // Runs getAllTabs again when any tab is updated
-chrome.tabs.onUpdated.addListener((id, object) => {
-    console.log("Here's the object:", object)
+chrome.tabs.onUpdated.addListener((id, updatedTab) => {
+    console.log("Here's the tab that got updated:", updatedTab)
     // Checks if loading status is complete. This reduces CPU usage by ignoring things like SNS notifications and other minor state changes.
-    if (object.status === "complete") {
+    if (updatedTab.status === "complete") {
         start();
     }
-    // start();
 });
 
+// Ensures the tab furthest to the left is first index in array when the user rearranges tabs.
 chrome.tabs.onMoved.addListener(() => {
     // Resets tabIdArray before rerunning
     start();
