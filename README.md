@@ -9,7 +9,7 @@
  ---
  ## Installation
  (Until Google accepts the extension in the store, the installation will have to be done manually)
- Download the release under `"Releases"` on the right hand side of this page. Go to the Extensions page. To get there, click on the dotted menu icon at the top right of your browser and under `"More tools"` click on `"Extensions"`. Once on the Extensions page, make sure "Developer Mode" is turned on on the top right corner of the screen. Then click on `"Load unpacked"`, and navigate to the place you downloaded the release. Select the folder you downloaded, and click "Select folder" to install the extension.
+ Download the release under `"Releases"` on the right hand side of this page and extract the zip file. In Chrome, go to the Extensions page. To get there, click on the dotted menu icon at the top right of your browser and under `"More tools"` click on `"Extensions"`. Once on the Extensions page, make sure "Developer Mode" is turned on on the top right corner of the screen. Then click on `"Load unpacked"`, and navigate to the place you downloaded the release. Select the folder you downloaded, and click "Select folder" to install the extension.
  
  ## Using Youtube Anywhere Remote
  After installing, click on the menu at the top left of the Extensions page and click on `"Keyboard shortcuts"`.  
