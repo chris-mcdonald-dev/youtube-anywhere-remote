@@ -12,7 +12,7 @@ if (!window.scriptInjected) {
         dVolumeUp: new KeyboardEvent('keydown', { 'keyCode': 38 }), // Not working yet
         eVolumeDown: new KeyboardEvent('keydown', { 'keyCode': 40 }), // Not working yet
         fNextVideo: new KeyboardEvent('keydown', { 'shiftKey': true, 'keyCode': 78 }),
-        gPreviousVideo: new KeyboardEvent('keydown', { 'altKey': true, 'keyCode': 37 }), // Not working yet
+        // gPreviousVideo works by using the browser tabs API command. Check commandHandler() in background.js
         hSpeedUp: new KeyboardEvent('keydown', { 'shiftKey': true, 'keyCode': 190 }),
         iSlowDown: new KeyboardEvent('keydown', { 'shiftKey': true, 'keyCode': 188 }),
     }

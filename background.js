@@ -36,7 +36,7 @@ function commandHandler() {
             };
         };
         if (timeoutFlag) {
-            // Next Video command sends goForward browser command instead of YouTube video "next" key command when not on a YouTube page with a video. (e.g. The homepage)
+            // Next Video command sends goForward browser-tab command instead of YouTube video "next" key command when not on a YouTube page with a video. (e.g. The homepage)
             if (youtubeTabs[0].url.includes('youtube.com/watch')) {
                 chrome.tabs.sendMessage(youtubeTabs[0].id, { message: command });
                 console.log('You sent keydown', command, "to", youtubeTabs[0].id);
