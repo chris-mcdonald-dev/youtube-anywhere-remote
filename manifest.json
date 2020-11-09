@@ -18,7 +18,7 @@
     "content_scripts": [
         {
             "matches": [
-                "http://*.youtube.com/watch*"
+                "http://*.youtube.com/*"
             ],
             "js": ["foreground.js"]
         }
@@ -35,6 +35,9 @@
         },
         "fNextVideo": {
             "description": "Next Video"
+        },
+        "gPreviousVideo": {
+            "description": "Previous Video"
         },
         "hSpeedUp": {
             "description": "Speed Up"
