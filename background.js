@@ -1,4 +1,3 @@
-tabIdArray = [];
 timeoutFlag = true;
 youtubeTabs = []
 
@@ -7,11 +6,19 @@ function getAllTabs() {
     chrome.tabs.getCurrent(currentTab => {
         chrome.tabs.getAllInWindow(currentTab, allTabs => {
             // Locates the Youtube Tabs and filters them into new array of objects
-            youtubeTabs = allTabs.filter(tab => tab.url.includes('youtube.com/watch'));
-
-            // Injects foreground.js into first Youtube tab of tabIdArray.
-            chrome.tabs.executeScript(youtubeTabs[0].id, { file: './foreground.js' });
-            console.log('Script executed on', youtubeTabs[0].id);
+            youtubeTabsExist = allTabs.filter(tab => tab.url.includes('youtube.com/watch'));
+            // Only updates tab array if YouTube tabs exist in the window.
+            // Reduces times script is executed, keeping the browser as responsive as possible. Also allows user to refresh windows without youtube tabs and keeps from losing control over windows with videos playing.
+            if (youtubeTabsExist.length != 0) {
+                youtubeTabs = youtubeTabsExist
+                // Injects foreground.js into first Youtube tab of youtubeTabs array.
+                chrome.tabs.executeScript(youtubeTabs[0].id, { file: './foreground.js' });
+                console.log('Script executed on:', '"' + youtubeTabs[0].title + '" ', '|  ID:', youtubeTabs[0].id);
+            }
+            else {
+                console.log('This window has no Youtube tabs.');
+            };
+            
         });
     });
 };
@@ -48,6 +55,5 @@ chrome.tabs.onUpdated.addListener((id, updatedTab) => {
 
 // Ensures the tab furthest to the left is first index in array when the user rearranges tabs.
 chrome.tabs.onMoved.addListener(() => {
-    // Resets tabIdArray before rerunning
     start();
 });
