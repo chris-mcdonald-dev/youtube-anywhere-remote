@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "YouTube Anywhere Remote",
-    "version": "0.1.1",
+    "version": "1.0.0",
     "icons": {
         "16": "assets/icon-16.png",
         "32": "assets/icon-32.png",
@@ -28,10 +28,16 @@
             "description": "Pause/Play"
         },
         "bRewind": {
-          "description": "Rewind"
+          "description": "Rewind (5 Seconds)"
         },
         "cFastforward": {
-            "description": "Fastforward"
+            "description": "Fast-forward (5 Seconds)"
+        },
+        "dVolumeUp": {
+            "description": "Volume Up"
+        },
+        "eVolumeDown": {
+            "description": "Volume Down"
         },
         "fNextVideo": {
             "description": "Next Video"
@@ -39,11 +45,14 @@
         "gPreviousVideo": {
             "description": "Previous Video"
         },
-        "hSpeedUp": {
-            "description": "Speed Up"
+        "hLoopCurrentVideo": {
+            "description": "Loop Current Video (Toggle)"
         },
-        "iSlowDown": {
-            "description": "Slow Down"
+        "iSpeedUp": {
+            "description": "Speed Up Playback"
+        },
+        "jSlowDown": {
+            "description": "Slow Down Playback"
         }
       }
 }
