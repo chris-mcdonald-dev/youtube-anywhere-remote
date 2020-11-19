@@ -14,12 +14,18 @@ function start() {
     getAllTabs();
 };
 
+function tabCheck(tab) {
+    if (tab.url.includes('youtube.com') || tab.url.includes('udemy.com')) {
+        return true;
+    }
+}
+
 // Makes sure any YouTube tabs already open in any window are accounted for and executes main script when program first runs
 function firstRun() {
     // Gets every tab open in every window
     chrome.tabs.query({}, (tabsInAllWindows) => {
         // filters out Youtube Tabs
-        allYoutubeTabs = tabsInAllWindows.filter(tab => tab.url.includes('youtube.com'));
+        allYoutubeTabs = tabsInAllWindows.filter(tabCheck);
         let windowIdArray = [];
         let windowsDetected = 0; // Used for debug purposes
         allYoutubeTabs.forEach(tab => {
@@ -38,7 +44,7 @@ function firstRun() {
                         window[tab.id + 'PushedFlag'] = true;
                         // Only executes script on YouTube tabs open furthest to the left in their respective windows
                         if (tab === window['browserWindow' + i][0]) {
-                            executeScript(tab);
+                            executeScript(tab); 
                             setTimeout(() => videoPausedCheck(tab), 100);
                             windowsDetected++;
                         };
@@ -51,10 +57,12 @@ function firstRun() {
     });
 };
 
+
+
 function getAllInWindow(currentTab) {
     chrome.tabs.getAllInWindow(currentTab, allTabs => {
         // Locates the Youtube Tabs and filters them into new array of objects
-        youtubeTabsExist = allTabs.filter(tab => tab.url.includes('youtube.com'));
+        youtubeTabsExist = allTabs.filter(tabCheck);
         // Only updates youtubeTabs array if YouTube tabs exist in the window.
         // Reduces times script is executed, keeping the browser as responsive as possible. Also allows user to refresh windows without youtube tabs and keeps from losing control over windows with videos playing.
         if (youtubeTabsExist.length != 0) {
@@ -78,20 +86,37 @@ function getAllTabs() {
 
 // Executes script on specified tab
 function executeScript(tab) {
-    chrome.tabs.executeScript(tab.id, { file: './foreground.js' });
-    console.log('Script executed on:', '"' + tab.title + '" ', '|  ID:', tab.id);
+    if (tab.url.includes('udemy.com/course')) {
+        chrome.tabs.executeScript(tab.id, { file: './udemy-foreground.js' });
+        console.log('Script executed on:', '"' + tab.title + '" ', '|  ID:', tab.id);
+    }
+    if (tab.url.includes('youtube.com')) {
+        chrome.tabs.executeScript(tab.id, { file: './youtube-foreground.js' });
+        console.log('Script executed on:', '"' + tab.title + '" ', '|  ID:', tab.id);
+    }
 };
 
 // Sends message to tab to check if video is paused
 function videoPausedCheck(tab) {
-    chrome.tabs.sendMessage(tab.id, { message: "Is your tab's video playing?" }, (response) => {
-        if (response === "No, you can run a script on the other window.") {
-            videoPausedFlag = true;
-        };
-    });
+    chrome.runtime.onMessage.addListener(videoLoadedHandler);
+    // Waits to receive message that foreground sends on load
+    function videoLoadedHandler(message, sender, sendResponse) {
+        if (message === 'Video loaded') {
+            chrome.runtime.onMessage.removeListener(videoLoadedHandler);
+            chrome.tabs.sendMessage(tab.id, { message: "Is your tab's video playing?" }, (response) => {
+                if (response === "No, you can run a script on the other window.") {
+                    videoPausedFlag = true;
+                };
+            });
+        }
+    }
 };
 
-
+// Checks if the tab is a known video page
+function VideoTabCheck(tab) {
+    if (tab.url.includes('youtube.com/watch') || tab.url.includes('udemy.com/course'))
+    return true;
+}
 
 // ------------------- EVENT LISTENERS -----------------------
 
@@ -108,13 +133,13 @@ chrome.commands.onCommand.addListener(listener = (command) => {
     };
     if (!timeoutFlag) {
         // Next Video command sends goForward browser-tab command instead of YouTube video "next" key command when not on a YouTube page with a video. (e.g. The homepage)
-        if (youtubeTabs[0].url.includes('youtube.com/watch')) {
+        if (VideoTabCheck(youtubeTabs[0])) {
             chrome.tabs.sendMessage(youtubeTabs[0].id, { message: command });
             console.log('You sent keydown', command, "to", youtubeTabs[0].id);
             timeoutFlag = true;
             setTimeout(() => { timeoutFlag = false }, 20);
         }
-        else if (command === "fNextVideo"){
+        else if (command === "fNextVideo" && youtubeTabs[0].url.includes('youtube.com')){
             chrome.tabs.goForward(youtubeTabs[0].id);
             timeoutFlag = true;
             setTimeout(() => { timeoutFlag = false }, 20);
@@ -130,7 +155,7 @@ chrome.tabs.onUpdated.addListener((id, changeInfo, updatedTab) => {
         // Doesn't update youtubeTabs array if user hasn't un-paused already open YouTube video in another window.
         // This allows users to have multiple windows with YouTube video tabs and have control over which window's YouTube video to send commands to. This keeps control focused on that video even while the user browses the internet in another window with YouTube tabs.
         try {
-            if ((updatedTab.url.includes('youtube.com/watch') && videoPausedFlag) || youtubeTabs.length === 0) {
+            if ((VideoTabCheck(updatedTab) && videoPausedFlag) || youtubeTabs.length === 0) {
                 // Checks if loading status is complete. This reduces CPU usage by ignoring things like SNS notifications and other minor state changes.
                 if (updatedTab.status === 'complete') {
                     start();
@@ -139,7 +164,7 @@ chrome.tabs.onUpdated.addListener((id, changeInfo, updatedTab) => {
                     return;
                 };
             };
-            if (updatedTab.url.includes('youtube.com/watch') && !videoPausedFlag) {
+            if (VideoTabCheck(updatedTab) && !videoPausedFlag) {
                 if (updatedTab.status === 'complete') {
                     executeScript(updatedTab);
                     backgroundLoadTimeoutFlag = true;
@@ -161,7 +186,7 @@ chrome.tabs.onMoved.addListener((id, movedTab) => {
         chrome.tabs.get(id, (movedTab) => {
             // Does the same thing as .onUpdated but when a tab is moved instead.
             try {
-                if ((movedTab.windowId === youtubeTabs[0].windowId) || (movedTab.url.includes('youtube.com/watch') && videoPausedFlag)) {
+                if ((movedTab.windowId === youtubeTabs[0].windowId) || (VideoTabCheck(movedTab) && videoPausedFlag)) {
                     start();
                     timeoutFlag = true;
                     setTimeout(() => timeoutFlag = false, 20);
@@ -177,6 +202,7 @@ chrome.tabs.onMoved.addListener((id, movedTab) => {
 
 // Runs start() when user un-pauses a video and changes videoPausedFlag accordingly.
 chrome.runtime.onMessage.addListener((videoPaused, sender, sendResponse) => {
+    if (typeof videoPaused !== "boolean") { return };
     if (!updateTimeoutFlag) {
         if (videoPaused) {
             console.log('Video on', sender.tab.id, 'has been paused.');
@@ -185,7 +211,7 @@ chrome.runtime.onMessage.addListener((videoPaused, sender, sendResponse) => {
         if (!videoPaused) {
             console.log('Video on', sender.tab.id, 'has been un-paused and is now playing.');
             videoPausedFlag = false;
-        };
+        };    
         // Prevents control focus from changing to 2nd loaded YouTube video when another video is playing in another window
         if (backgroundLoadTimeoutFlag && (sender.tab.id != youtubeTabs[0].id) && (youtubeTabs.length != 0)) {
             return;
