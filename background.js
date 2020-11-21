@@ -174,7 +174,7 @@ chrome.tabs.onUpdated.addListener((id, changeInfo, updatedTab) => {
         }
         catch (error) {
             // Ignores very specific error. If having trouble debugging you can try commenting it out. Note the console will be flooded with error whenever empty tab is opened.
-            if (!error.toString().includes("Cannot read property 'windowId' of undefined")) { console.log(error) };
+            if (!error.message.includes("Cannot read property 'windowId' of undefined")) { throw error };
         };
     };
 });
@@ -194,7 +194,7 @@ chrome.tabs.onMoved.addListener((id, movedTab) => {
             }
             catch (error) {
                 // See similar error in .onUpdated
-                if (!error.toString().includes("Cannot read property 'windowId' of undefined")) { console.log(error) };
+                if (!error.message.includes("Cannot read property 'windowId' of undefined")) { throw error };
             };
         });
     };
