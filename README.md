@@ -5,7 +5,7 @@
  This allows you to control Youtube videos even while your browser is minimized or while using other programs.  
  The extension also lets you choose all of your own shortcuts for ease of use.
  
-![](/assets/tutorials.gif)
+![](/assets/Github/tutorials.gif)
  
  ---
   ## How to Use YouTube Anywhere Remote
@@ -28,5 +28,5 @@
  
  **IMPORTANT:** Make sure to switch `"In Chrome"` to `"Global"` if you want to use features while you're using other programs or have your browser minimized.
 
-![](/assets/Shortcuts.png)
+![](/assets/Github/Shortcuts.png)
  
