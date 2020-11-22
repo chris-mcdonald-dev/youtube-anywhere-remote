@@ -53,6 +53,12 @@ function showInfoOverlay(command) {
             else {
                 textTop.innerText = "Video will no longer loop";
             }
+            break;
+        case "volume":
+            textTop.innerText = "Volume";
+            textBottom.innerText = video.volume.toFixed(1).toString();
+            textBottom.classList.add("show");
+            break;
     }
     
     infoOverlay.appendChild(textTop);
@@ -97,7 +103,7 @@ function mainScript() {
             else {
                 video.volume = 1;
             };
-            console.log('Volume:', video.volume);
+            showInfoOverlay('volume');
         },
         'eVolumeDown': () => {
             if (video.volume > .1) {
@@ -106,7 +112,7 @@ function mainScript() {
             else {
                 video.volume = 0;
             };
-            console.log('Volume:', video.volume);
+            showInfoOverlay('volume');
         },
         'fNextVideo': () => {
             if (nextButton !== null) {
@@ -119,7 +125,6 @@ function mainScript() {
             }
         },
         'hLoopCurrentVideo': () => {
-            showInfoOverlay('loop');
             if (!video.loop) {
                 video.loop = true;
                 console.log('Video will now loop');
@@ -128,6 +133,7 @@ function mainScript() {
                 video.loop = false;
                 console.log('Video will no longer loop');
             };
+            showInfoOverlay('loop');
         },
         'iSpeedUp': () => {
             if (video.playbackRate < 2.4) {

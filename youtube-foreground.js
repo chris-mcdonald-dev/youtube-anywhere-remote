@@ -39,7 +39,7 @@ if (!window.scriptInjected) {
             else {
                 video.volume = 1
             };
-            console.log('Volume:', video.volume);
+            showInfoOverlay('volume');
         },
         'eVolumeDown': () => {
             if (video.volume > .1) {
@@ -48,7 +48,7 @@ if (!window.scriptInjected) {
             else {
                 video.volume = 0
             };
-            console.log('Volume:', video.volume);
+            showInfoOverlay('volume');
         },
         'hLoopCurrentVideo': () => {
             if (!video.loop) {
@@ -112,12 +112,17 @@ function showInfoOverlay(command) {
     // Set Inner Text of New Elements
     switch (command) {
         case "loop":
-            if (!video.loop) {
+            if (video.loop) {
                 textTop.innerText = "Video will now loop";
             }
             else {
                 textTop.innerText = "Video will no longer loop";
             }
+            break;
+        case "volume":
+            textTop.innerText = "Volume";
+            textBottom.innerText = video.volume.toFixed(1).toString();
+            textBottom.classList.add("show");
     }
     
     infoOverlay.appendChild(textTop);
