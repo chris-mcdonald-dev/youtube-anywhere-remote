@@ -94,6 +94,7 @@ function executeScript(tab) {
         chrome.tabs.executeScript(tab.id, { file: './youtube-foreground.js' });
         console.log('Script executed on:', '"' + tab.title + '" ', '|  ID:', tab.id);
     }
+    chrome.tabs.insertCSS(tab.id, { file: './styles/info-overlay.css' });
 };
 
 // Sends message to tab to check if video is paused

@@ -16,6 +16,59 @@ function initiate() {
     }
 }
 
+function showInfoOverlay(command) {
+    // Clears timeout so timeout for element staying on screen is restarted below
+    if (window.overlayTimeout != undefined) {
+        clearTimeout(window.overlayTimeout);
+        clearTimeout(fadeTimeout);
+        infoOverlay.classList.remove('fade');
+        textTop.innerHTML = "";
+        textBottom.innerHTML = "";
+        textBottom.classList.remove("show");
+    }
+    
+    if (!window.infoOverlay) {
+        window.overlayTimeout = 'temp'; // temporarily defines var
+        window.infoOverlay = document.createElement("div");
+        infoOverlay.className = "ytrInfoOverlay";
+        textTop = document.createElement("p");
+        textBottom = document.createElement("p");
+        textTop.className = "ytrText ytrTextTop ytrText--nudgeDown";
+        textBottom.className = "ytrText ytrTextBottom";
+        container = document.createElement("div");
+        container.className = "ytrInfoOverlayCont";
+    }
+    
+    // Set Inner Text of New Elements
+    switch (command) {
+        case "speed":
+            textTop.innerText = "Playback Speed";
+            textBottom.innerText = video.playbackRate.toFixed(1).toString();
+            textBottom.classList.add("show");
+            break;
+        case "loop":
+            if (video.loop) {
+                textTop.innerText = "Video will now loop";
+            }
+            else {
+                textTop.innerText = "Video will no longer loop";
+            }
+    }
+    
+    infoOverlay.appendChild(textTop);
+    infoOverlay.appendChild(textBottom);
+    container.appendChild(infoOverlay);
+    videoParent.appendChild(container);
+    
+    // Element is removed
+    window.fadeTimeout = setTimeout(() => {
+        infoOverlay.classList.add('fade');
+        window.overlayTimeout = setTimeout(() => {
+            infoOverlay.remove();
+        }, 1050);
+    }, 2000);
+}
+
 function mainScript() {
     console.log('Script has been injected');
     chrome.runtime.sendMessage('Video loaded');
@@ -66,6 +119,7 @@ function mainScript() {
             }
         },
         'hLoopCurrentVideo': () => {
+            showInfoOverlay('loop');
             if (!video.loop) {
                 video.loop = true;
                 console.log('Video will now loop');
@@ -82,6 +136,7 @@ function mainScript() {
                 video.playbackRate = 2.5;
             }
             console.log(video.playbackRate);
+            showInfoOverlay('speed');
         },
         'jSlowDown': () => {
             if (video.playbackRate > .4) {
@@ -90,15 +145,17 @@ function mainScript() {
                 video.playbackRate = .3;
             }
             console.log(video.playbackRate);
+            showInfoOverlay('speed');
         }};
     
 
-    video = document.querySelector('video')
-    nextButton = document.querySelector("[data-purpose = 'go-to-next']")
-    previousButton = document.querySelector("[data-purpose = 'go-to-previous']")
+    video = document.querySelector('video');
+    videoParent = video.parentElement.parentElement;
+    nextButton = document.querySelector("[data-purpose = 'go-to-next']");
+    previousButton = document.querySelector("[data-purpose = 'go-to-previous']");
     
     // MutationObserver doesn't seem to work for all of Udemy's video attributes. Registers clicks on video container and sends state of video paused attribute instead.
-    video.parentElement.parentElement.addEventListener('click', () => {
+    videoParent.addEventListener('click', () => {
         chrome.runtime.sendMessage(video.paused);
     })
 

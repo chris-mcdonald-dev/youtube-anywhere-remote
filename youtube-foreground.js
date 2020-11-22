@@ -5,6 +5,7 @@ if (!window.scriptInjected) {
     chrome.runtime.sendMessage('Video loaded');
 
     video = document.querySelector('video');
+    videoParent = video.parentElement;
 
     // Creates a MutationsObserver to monitor video DOM element
     const observer = new MutationObserver((mutations) => {
@@ -52,12 +53,11 @@ if (!window.scriptInjected) {
         'hLoopCurrentVideo': () => {
             if (!video.loop) {
                 video.loop = true;
-                console.log('Video will now loop');
             }
             else {
                 video.loop = false;
-                console.log('Video will no longer loop');
             };
+            showInfoOverlay('loop');
         }
     };
 
@@ -84,4 +84,52 @@ if (!window.scriptInjected) {
             }
         }
     });
+}
+
+function showInfoOverlay(command) {
+    // Clears timeout so timeout for element staying on screen is restarted below
+    if (window.overlayTimeout != undefined) {
+        clearTimeout(window.overlayTimeout);
+        clearTimeout(fadeTimeout);
+        infoOverlay.classList.remove('fade');
+        textTop.innerHTML = "";
+        textBottom.innerHTML = "";
+        textBottom.classList.remove("show");
+    }
+    
+    if (!window.infoOverlay) {
+        window.overlayTimeout = 'temp'; // temporarily defines var
+        window.infoOverlay = document.createElement("div");
+        infoOverlay.className = "ytrInfoOverlay";
+        textTop = document.createElement("p");
+        textBottom = document.createElement("p");
+        textTop.className = "ytrText ytrTextTop";
+        textBottom.className = "ytrText ytrTextBottom";
+        container = document.createElement("div");
+        container.className = "ytrInfoOverlayCont";
+    }
+    
+    // Set Inner Text of New Elements
+    switch (command) {
+        case "loop":
+            if (!video.loop) {
+                textTop.innerText = "Video will now loop";
+            }
+            else {
+                textTop.innerText = "Video will no longer loop";
+            }
+    }
+    
+    infoOverlay.appendChild(textTop);
+    infoOverlay.appendChild(textBottom);
+    container.appendChild(infoOverlay);
+    videoParent.appendChild(container);
+    
+    // Element is removed
+    window.fadeTimeout = setTimeout(() => {
+        infoOverlay.classList.add('fade');
+        window.overlayTimeout = setTimeout(() => {
+            infoOverlay.remove();
+        }, 1050);
+    }, 2000);
 }
