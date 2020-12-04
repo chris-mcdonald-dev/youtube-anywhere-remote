@@ -5,7 +5,7 @@
  This allows you to control Youtube videos even while your browser is minimized or while using other programs.  
  The extension also lets you choose all of your own shortcuts for ease of use.
  
-![](/assets/tutorials.gif)
+![](/assets/Github/tutorials.gif)
  
  ---
   ## How to Use YouTube Anywhere Remote
@@ -14,7 +14,7 @@
  
  ## Installation
 ### [Get YouTube Anywhere Remote from the Chrome Store](https://chrome.google.com/webstore/detail/youtube-anywhere-remote/hjimacdiplfkaobglkdgkmhlamjjlnik?hl=en-US&authuser=3)
-(A quick and easy installation can also be done via the Chrome store. Keep in mind, releases posted to the github page typically take 2-3 days to get accepted by Google in the Chrome store.)  
+(A quick and easy installation can be done via the Chrome store. Keep in mind, releases posted to the github page typically take 2-3 days to get accepted by Google in the Chrome store.)  
   
  Alternatively, here's how to install it manually from the github page: 
  1. Download the release under `"Releases"` on the right hand side of this page and extract the zip file.  
@@ -28,5 +28,5 @@
  
  **IMPORTANT:** Make sure to switch `"In Chrome"` to `"Global"` if you want to use features while you're using other programs or have your browser minimized.
 
-![](/assets/Shortcuts.png)
+![](/assets/Github/Shortcuts.png)
  
