@@ -100,13 +100,13 @@ function showInfoOverlay(command) {
     if (!window.infoOverlay) {
         window.overlayTimeout = 'temp'; // temporarily defines var
         window.infoOverlay = document.createElement("div");
-        infoOverlay.className = "ytrInfoOverlay";
+        infoOverlay.className = "ytrInfoOverlay noclick";
         textTop = document.createElement("p");
         textBottom = document.createElement("p");
-        textTop.className = "ytrText ytrTextTop";
-        textBottom.className = "ytrText ytrTextBottom";
+        textTop.className = "ytrText ytrTextTop noclick";
+        textBottom.className = "ytrText ytrTextBottom noclick";
         container = document.createElement("div");
-        container.className = "ytrInfoOverlayCont";
+        container.className = "ytrInfoOverlayCont noclick";
     }
     
     // Set Inner Text of New Elements

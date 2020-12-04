@@ -16,6 +16,7 @@ function initiate() {
     }
 }
 
+
 function showInfoOverlay(command) {
     // Clears timeout so timeout for element staying on screen is restarted below
     if (window.overlayTimeout != undefined) {
@@ -30,13 +31,13 @@ function showInfoOverlay(command) {
     if (!window.infoOverlay) {
         window.overlayTimeout = 'temp'; // temporarily defines var
         window.infoOverlay = document.createElement("div");
-        infoOverlay.className = "ytrInfoOverlay";
+        infoOverlay.className = "ytrInfoOverlay noclick";
         textTop = document.createElement("p");
         textBottom = document.createElement("p");
-        textTop.className = "ytrText ytrTextTop ytrText--nudgeDown";
-        textBottom.className = "ytrText ytrTextBottom";
+        textTop.className = "ytrText ytrTextTop ytrText--nudgeDown noclick";
+        textBottom.className = "ytrText ytrTextBottom noclick";
         container = document.createElement("div");
-        container.className = "ytrInfoOverlayCont";
+        container.className = "ytrInfoOverlayCont noclick";
     }
     
     // Set Inner Text of New Elements
@@ -75,6 +76,7 @@ function showInfoOverlay(command) {
     }, 2000);
 }
 
+
 function mainScript() {
     console.log('Script has been injected');
     chrome.runtime.sendMessage('Video loaded');
@@ -82,6 +84,9 @@ function mainScript() {
     // All commands handled via the DOM
     domElementCommands = {
         'aPausePlay': () => {
+            // if (typeof playbackRateTemp != "undefined" && video.playbackRate == 1) {
+            //     video.playbackRateTemp = 1;
+            // }
             if (video.paused) {
                 video.play();
                 chrome.runtime.sendMessage(video.paused);
@@ -127,11 +132,9 @@ function mainScript() {
         'hLoopCurrentVideo': () => {
             if (!video.loop) {
                 video.loop = true;
-                console.log('Video will now loop');
             }
             else {
                 video.loop = false;
-                console.log('Video will no longer loop');
             };
             showInfoOverlay('loop');
         },
@@ -141,7 +144,7 @@ function mainScript() {
             } else {
                 video.playbackRate = 2.5;
             }
-            console.log(video.playbackRate);
+            playbackRateTemp = video.playbackRate;
             showInfoOverlay('speed');
         },
         'jSlowDown': () => {
@@ -150,9 +153,10 @@ function mainScript() {
             } else {
                 video.playbackRate = .3;
             }
-            console.log(video.playbackRate);
+            playbackRateTemp = video.playbackRate;
             showInfoOverlay('speed');
-        }};
+        }
+    };
     
 
     video = document.querySelector('video');
@@ -160,6 +164,8 @@ function mainScript() {
     nextButton = document.querySelector("[data-purpose = 'go-to-next']");
     previousButton = document.querySelector("[data-purpose = 'go-to-previous']");
     
+
+
     // MutationObserver doesn't seem to work for all of Udemy's video attributes. Registers clicks on video container and sends state of video paused attribute instead.
     videoParent.addEventListener('click', () => {
         chrome.runtime.sendMessage(video.paused);
@@ -174,12 +180,24 @@ function mainScript() {
             window.scriptInjected = false;
             initiate();
         }
+        
+        // Overrides Udemy's playbackRate reset functionality and ensures playback rate is not reset when video is resumed
+        if (mutations[0].target.data === ("Play") || ("Pause")) { // observer will only fire on characterData here for some reason
+            if (video.playbackRate != 1) {
+                playbackRateTemp = video.playbackRate;
+            }
+            if (typeof playbackRateTemp != "undefined") {
+                video.playbackRate = playbackRateTemp;
+            }
+        }
         chrome.runtime.sendMessage(video.paused);
     });
 
-    observer.observe(video, {
+    observer.observe(video.parentElement, {
         attributes: true,
-        attributeFilter: ['pause', 'src']
+        characterData: true,
+        subtree: true,
+        attributeFilter: ['src']
     });
     
     chrome.runtime.onMessage.addListener(commandHandler);
