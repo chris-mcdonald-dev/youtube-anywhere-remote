@@ -1,0 +1,55 @@
+/* !important used as a blanket temporary fix for unknown inherited properties */
+
+.ytrInfoOverlayCont {
+	display: flex !important;
+	width: 100% !important;
+	height: 100% !important;
+	position: absolute !important;
+	justify-content: center !important;
+	align-items: center !important;
+}
+
+.ytrInfoOverlay {
+	position: relative !important;
+	color: white !important;
+	display: flex !important;
+	flex-direction: column !important;
+	justify-content: center !important;
+	align-items: center !important;
+	width: 100px !important;
+	height: 100px !important;
+	border-radius: 2.5px !important;
+	background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.ytrInfoOverlay.fade {
+	opacity: 0 !important;
+	transition: opacity 1s !important;
+}
+
+.ytrText {
+	text-align: center !important;
+	text-shadow: 3px 3px 9px rgba(0, 0, 0, 0.88) !important;
+}
+
+.ytrText--nudgeDown {
+	padding-top: 10px !important;
+}
+
+.ytrTextTop {
+	font-size: 0.75rem !important;
+}
+
+.ytrTextBottom {
+	font-size: 1.5rem !important;
+	height: 1rem !important;
+	position: absolute !important;
+}
+
+.ytrTextBottom.show {
+	position: relative !important;
+}
+
+.noclick {
+	pointer-events: none !important;
+}
