@@ -8,7 +8,7 @@
         "48": "assets/icon-48.png",
         "128": "assets/icon-128.png"
     },
-    "description": "YouTube Anywhere Remote allows you to control videos on YouTube and Udemy even while you're using other programs!",
+    "description": "YouTube Anywhere Remote allows you to control videos on YouTube, Udemy, and AmigosCode even while you're using other programs!",
     "background": {
         "scripts": ["./background.js"]
     },
