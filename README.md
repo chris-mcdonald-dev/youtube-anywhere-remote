@@ -17,7 +17,7 @@
 (A quick and easy installation can be done via the Chrome store. Keep in mind, releases posted to the github page typically take 2-3 days to get accepted by Google in the Chrome store.)  
   
  Alternatively, here's how to install it manually from the github page: 
- 1. Download the release under `"Releases"` on the right hand side of this page and extract the zip file.  
+ 1. Download the latest release [here](https://github.com/crobin93/youtube-anywhere-remote/releases) and extract the zip file.  
  2. In Chrome, go to the Extensions page. (To get there, click on the dotted menu icon at the top right of your browser and under `"More tools"` click on `"Extensions"`)  
  3. Once on the Extensions page, make sure "Developer Mode" is turned on on the top right corner of the screen.  
  4. Then click on `"Load unpacked"`, and navigate to the place you extracted the zip file. Select the folder you extracted the zip file's contents to, and click "Select folder" to install the extension.
