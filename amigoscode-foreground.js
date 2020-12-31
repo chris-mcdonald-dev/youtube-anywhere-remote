@@ -158,7 +158,7 @@ function mainScript() {
 	nextButton = document.getElementById("lecture_complete_button");
 	previousButton = document.getElementById("lecture_previous_button");
 
-	// MutationObserver doesn't seem to work for all of Udemy's video attributes. Registers clicks on video container and sends state of video paused attribute instead.
+	// MutationObserver doesn't seem to work for every website's video attributes. Registers clicks on video container and sends state of video paused attribute instead.
 	pauseElement.addEventListener("click", () => {
 		chrome.runtime.sendMessage(video.paused);
 	});
@@ -173,7 +173,7 @@ function mainScript() {
 			initiate();
 		}
 
-		// Overrides Udemy's playbackRate reset functionality and ensures playback rate is not reset when video is resumed
+		// Overrides some site's playbackRate reset functionality and ensures playback rate is not reset when video is resumed
 		if (mutations[0].target.data === "Play" || "Pause") {
 			// observer will only fire on characterData here for some reason
 			if (video.playbackRate != 1) {
