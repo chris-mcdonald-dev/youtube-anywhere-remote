@@ -4,8 +4,9 @@
  Youtube Anywhere Remote is a Chrome extension that allows you to control videos playing on Youtube from anywhere on your computer.  
  This allows you to control Youtube videos even while your browser is minimized or while using other programs.  
  The extension also lets you choose all of your own shortcuts for ease of use.
- 
-![](/assets/Github/tutorials.gif)
+
+## Video Showcasing Features
+[![Feature Showcase YouTube Video](https://img.youtube.com/vi/t_ZktwohTDg/0.jpg)](https://www.youtube.com/watch?v=t_ZktwohTDg)
  
  ---
   ## How to Use YouTube Anywhere Remote
