@@ -166,10 +166,13 @@ function mainScript() {
 	const observer = new MutationObserver((mutations) => {
 		// Restarts script if video 'src' changes
 		if (mutations[0].attributeName === "src") {
-			chrome.runtime.onMessage.removeListener(commandHandler);
-			chrome.runtime.onMessage.removeListener(videoPausedHandler);
-			window.scriptInjected = false;
-			initiate();
+			/* Ensure mutated source node is of video type */
+			if (mutations[0].target.tagName === "VIDEO") {
+				chrome.runtime.onMessage.removeListener(commandHandler);
+				chrome.runtime.onMessage.removeListener(videoPausedHandler);
+				window.scriptInjected = false;
+				initiate();
+			}
 		}
 
 		// Overrides Udemy's playbackRate reset functionality and ensures playback rate is not reset when video is resumed
