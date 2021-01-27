@@ -1,3 +1,4 @@
+console.log("TRIED TO RUN");
 initiate();
 
 function initiate() {
@@ -81,9 +82,6 @@ function mainScript() {
 	// All commands handled via the DOM
 	domElementCommands = {
 		aPausePlay: () => {
-			// if (typeof playbackRateTemp != "undefined" && video.playbackRate == 1) {
-			//     video.playbackRateTemp = 1;
-			// }
 			if (video.paused) {
 				video.play();
 				chrome.runtime.sendMessage(video.paused);
@@ -153,20 +151,21 @@ function mainScript() {
 	};
 
 	video = document.querySelector("video");
+	source = video.src;
+
+	/* Keep playbackRate from resetting on reload */
+	video.playbackRate = typeof playbackRateTemp === "undefined" ? video.playbackRate : playbackRateTemp;
+
 	videoParent = video.parentElement.parentElement;
 	nextButton = document.querySelector("[data-purpose = 'go-to-next']");
 	previousButton = document.querySelector("[data-purpose = 'go-to-previous']");
 
 	// MutationObserver doesn't seem to work for all of Udemy's video attributes. Registers clicks on video container and sends state of video paused attribute instead.
-	videoParent.addEventListener("click", () => {
-		chrome.runtime.sendMessage(video.paused);
-	});
 
 	// Creates a MutationsObserver to monitor video DOM element
 	const observer = new MutationObserver((mutations) => {
 		// Restarts script if video 'src' changes
 		if (mutations[0].attributeName === "src") {
-			/* Ensure mutated source node is of video type */
 			if (mutations[0].target.tagName === "VIDEO") {
 				chrome.runtime.onMessage.removeListener(commandHandler);
 				chrome.runtime.onMessage.removeListener(videoPausedHandler);
@@ -174,20 +173,35 @@ function mainScript() {
 				initiate();
 			}
 		}
+	});
 
-		// Overrides Udemy's playbackRate reset functionality and ensures playback rate is not reset when video is resumed
-		if (mutations[0].target.data === "Play" || "Pause") {
-			// observer will only fire on characterData here for some reason
+	video.addEventListener("pause", playPauseHandler);
+	video.addEventListener("play", playPauseHandler);
+	let playPauseTimeoutFlag = false;
+
+	function playPauseHandler() {
+		if (!playPauseTimeoutFlag) {
+			console.log("VIDEO HAS BEEN PAUSED: ", video.paused);
+			/* Overrides Udemy's playbackRate reset functionality and ensures playback rate is not reset when video is resumed */
 			if (video.playbackRate != 1) {
 				playbackRateTemp = video.playbackRate;
 			}
 			if (typeof playbackRateTemp != "undefined") {
 				video.playbackRate = playbackRateTemp;
 			}
+			/* -------------------------------- */
+			chrome.runtime.sendMessage(video.paused);
+			playPauseTimeoutFlag = true;
+			playPauseTimeout = setTimeout(() => {
+				playPauseTimeoutFlag = false;
+			}, 400);
 		}
-		chrome.runtime.sendMessage(video.paused);
-	});
+	}
 
+	/* Start observer with timeout to prevent looping */
+	// setTimeout(() => {
+
+	// }, 1000);
 	observer.observe(video.parentElement, {
 		attributes: true,
 		characterData: true,

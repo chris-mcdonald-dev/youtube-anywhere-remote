@@ -232,6 +232,10 @@ chrome.runtime.onMessage.addListener((videoPaused, sender, sendResponse) => {
 		if (backgroundLoadTimeoutFlag && sender.tab.id != youtubeTabs[0].id && youtubeTabs.length != 0) {
 			return;
 		}
+
+		/* Prevents script from being re-injected on active tab */
+		if (sender.tab.id == youtubeTabs[0].id) return;
+
 		// Gets all tabs in window of the video the user last paused instead of video loaded and adds to youtubeTabs array.
 		getAllInWindow(sender.tab.windowId);
 	}
