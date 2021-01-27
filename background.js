@@ -129,8 +129,8 @@ function VideoTabCheck(tab) {
 chrome.commands.onCommand.addListener(
 	(listener = (command) => {
 		// Commands will stack on top of each other if a timeoutFlag is not used
-		// Previous Video command only gets sent when on a YouTube page with a video. (e.g. Not the homepage)
-		if (command === "gPreviousVideo" && youtubeTabs[0].url.includes("youtube.com/watch")) {
+		// Previous Video command only gets sent when on a YouTube page with a video (e.g. Not the homepage) or when on a Udemy quiz content page.
+		if ((command === "gPreviousVideo" && youtubeTabs[0].url.includes("youtube.com/watch")) || (command === "gPreviousVideo" && youtubeTabs[0].url.includes("/learn/quiz/"))) {
 			if (!timeoutFlag) {
 				chrome.tabs.goBack(youtubeTabs[0].id);
 				timeoutFlag = true;
@@ -159,13 +159,21 @@ chrome.commands.onCommand.addListener(
 	})
 );
 
-// Runs getAllTabs again when any tab is updated
+// Runs start() again when any tab is updated
 chrome.tabs.onUpdated.addListener((id, changeInfo, updatedTab) => {
 	if (!updateTimeoutFlag) {
 		// Ignores changes to tabs' audible property
 		if (changeInfo.audible != undefined) return;
+		if (changeInfo.status != "complete") return;
+
+		if (updatedTab.url.includes("udemy.com/course")) {
+			chrome.tabs.sendMessage(youtubeTabs[0].id, { message: "Refreshing" });
+			console.log("SENDING MESSAGE ON REFRESH");
+		}
+
 		// Doesn't update youtubeTabs array if user hasn't un-paused already open YouTube video in another window.
 		// This allows users to have multiple windows with YouTube video tabs and have control over which window's YouTube video to send commands to. This keeps control focused on that video even while the user browses the internet in another window with YouTube tabs.
+
 		try {
 			if ((VideoTabCheck(updatedTab) && videoPausedFlag) || youtubeTabs.length === 0) {
 				// Checks if loading status is complete. This reduces CPU usage by ignoring things like SNS notifications and other minor state changes.

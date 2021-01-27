@@ -1,16 +1,23 @@
-console.log("TRIED TO RUN");
 initiate();
 
 function initiate() {
 	if (!window.scriptInjected) {
 		window.scriptInjected = true; //Prevents script from being run multiple times per tab
-		interval = setInterval(videoLoadedCheck, 500);
+		if (typeof window.interval !== "undefined") {
+			clearInterval(window.interval);
+		}
+		window.interval = setInterval(videoLoadedCheck, 500);
 		videoLoadedCheck(); //Calls interval function immediately
 		function videoLoadedCheck() {
 			if (document.querySelector("video") === null) {
 				console.log("Waiting for video to load...");
+				/* Separately loads text script when text content is detected */
+				if (document.querySelector("[class^=text-viewer]") || document.querySelector("[class^=quiz-page]")) {
+					clearInterval(window.interval);
+					mainTextScript();
+				}
 			} else {
-				clearInterval(interval);
+				clearInterval(window.interval);
 				mainScript();
 			}
 		}
@@ -160,21 +167,7 @@ function mainScript() {
 	nextButton = document.querySelector("[data-purpose = 'go-to-next']");
 	previousButton = document.querySelector("[data-purpose = 'go-to-previous']");
 
-	// MutationObserver doesn't seem to work for all of Udemy's video attributes. Registers clicks on video container and sends state of video paused attribute instead.
-
-	// Creates a MutationsObserver to monitor video DOM element
-	const observer = new MutationObserver((mutations) => {
-		// Restarts script if video 'src' changes
-		if (mutations[0].attributeName === "src") {
-			if (mutations[0].target.tagName === "VIDEO") {
-				chrome.runtime.onMessage.removeListener(commandHandler);
-				chrome.runtime.onMessage.removeListener(videoPausedHandler);
-				window.scriptInjected = false;
-				initiate();
-			}
-		}
-	});
-
+	/* Sends message to background.js on pause and play */
 	video.addEventListener("pause", playPauseHandler);
 	video.addEventListener("play", playPauseHandler);
 	let playPauseTimeoutFlag = false;
@@ -198,24 +191,23 @@ function mainScript() {
 		}
 	}
 
-	/* Start observer with timeout to prevent looping */
-	// setTimeout(() => {
-
-	// }, 1000);
-	observer.observe(video.parentElement, {
-		attributes: true,
-		characterData: true,
-		subtree: true,
-		attributeFilter: ["src"],
-	});
-
 	chrome.runtime.onMessage.addListener(commandHandler);
+	chrome.runtime.onMessage.addListener(refreshHandler);
 
 	function commandHandler(request, sender, sendResponse) {
 		// Uses incoming message as a dynamic key to call command function
 		if (Object.keys(domElementCommands).includes(request.message)) {
 			console.log("Command received: ", request.message);
 			domElementCommands[request.message]();
+		}
+	}
+
+	function refreshHandler(request, sender, sendResponse) {
+		if (request.message === "Refreshing") {
+			chrome.runtime.onMessage.removeListener(commandHandler);
+			window.scriptInjected = false;
+			// initiate();
+			chrome.runtime.onMessage.removeListener(refreshHandler);
 		}
 	}
 
@@ -229,6 +221,47 @@ function mainScript() {
 			} else {
 				sendResponse("No, you can run a script on the other window.");
 			}
+		}
+	}
+}
+
+/* Main text that runs if text content is detected */
+function mainTextScript() {
+	console.log("Text content detected...\nScript injected");
+
+	nextButton = document.querySelector("[data-purpose = 'go-to-next']");
+	previousButton = document.querySelector("[data-purpose = 'go-to-previous']");
+
+	domElementCommands = {
+		fNextVideo: () => {
+			if (nextButton !== null) {
+				nextButton.click();
+			}
+		},
+		gPreviousVideo: () => {
+			if (previousButton !== null) {
+				previousButton.click();
+			}
+		},
+	};
+
+	chrome.runtime.onMessage.addListener(commandHandler);
+	chrome.runtime.onMessage.addListener(refreshHandler);
+
+	function commandHandler(request, sender, sendResponse) {
+		// Uses incoming message as a dynamic key to call command function
+		if (Object.keys(domElementCommands).includes(request.message)) {
+			console.log("Command received: ", request.message);
+			domElementCommands[request.message]();
+		}
+	}
+
+	function refreshHandler(request, sender, sendResponse) {
+		if (request.message === "Refreshing") {
+			chrome.runtime.onMessage.removeListener(commandHandler);
+			window.scriptInjected = false;
+			// initiate();
+			chrome.runtime.onMessage.removeListener(refreshHandler);
 		}
 	}
 }
