@@ -1,3 +1,7 @@
+if (chrome) {
+	browser = chrome;
+}
+
 // ----------------- MAIN GLOBAL VARIABLES ---------------
 let timeoutFlag = false;
 let updateTimeoutFlag = false;
@@ -21,7 +25,7 @@ function tabCheck(tab) {
 // Makes sure any YouTube tabs already open in any window are accounted for and executes main script when program first runs
 function firstRun() {
 	// Gets every tab open in every window
-	chrome.tabs.query({}, (tabsInAllWindows) => {
+	browser.tabs.query({}, (tabsInAllWindows) => {
 		// filters out Youtube Tabs
 		allYoutubeTabs = tabsInAllWindows.filter(tabCheck);
 		let windowIdArray = [];
@@ -55,8 +59,8 @@ function firstRun() {
 	});
 }
 
-function getAllInWindow(currentTab) {
-	chrome.tabs.getAllInWindow(currentTab, (allTabs) => {
+function getAllInWindow() {
+	browser.tabs.query({ currentWindow: true }, (allTabs) => {
 		// Locates the Youtube Tabs and filters them into new array of objects
 		youtubeTabsExist = allTabs.filter(tabCheck);
 		// Only updates youtubeTabs array if YouTube tabs exist in the window.
@@ -74,7 +78,7 @@ function getAllInWindow(currentTab) {
 
 // Use current tab's info to get info of allTabs with "getAllInWindow"
 function getAllTabs() {
-	chrome.tabs.getCurrent((currentTab) => {
+	browser.tabs.getCurrent((currentTab) => {
 		getAllInWindow(currentTab);
 	});
 }
@@ -82,32 +86,32 @@ function getAllTabs() {
 // Executes script on specified tab
 function executeScript(tab) {
 	if (tab.url.includes("udemy.com/course")) {
-		chrome.tabs.executeScript(tab.id, { file: "./udemy-foreground.js" });
-		chrome.tabs.insertCSS(tab.id, { file: "./styles/info-overlay.css" });
+		browser.tabs.executeScript(tab.id, { file: "./udemy-foreground.js" });
+		browser.tabs.insertCSS(tab.id, { file: "./styles/info-overlay.css" });
 		console.log("Script executed on:", '"' + tab.title + '" ', "|  ID:", tab.id);
 	}
 
 	if (tab.url.includes("youtube.com")) {
-		chrome.tabs.executeScript(tab.id, { file: "./youtube-foreground.js" });
-		chrome.tabs.insertCSS(tab.id, { file: "./styles/info-overlay.css" });
+		browser.tabs.executeScript(tab.id, { file: "./youtube-foreground.js" });
+		browser.tabs.insertCSS(tab.id, { file: "./styles/info-overlay.css" });
 		console.log("Script executed on:", '"' + tab.title + '" ', "|  ID:", tab.id);
 	}
 
 	if (tab.url.includes("amigoscode.com/courses") && tab.url.includes("lectures")) {
-		chrome.tabs.executeScript(tab.id, { file: "./amigoscode-foreground.js" });
-		chrome.tabs.insertCSS(tab.id, { file: "./styles/amigos-overlay.css" });
+		browser.tabs.executeScript(tab.id, { file: "./amigoscode-foreground.js" });
+		browser.tabs.insertCSS(tab.id, { file: "./styles/amigos-overlay.css" });
 		console.log("Script executed on:", '"' + tab.title + '" ', "|  ID:", tab.id);
 	}
 }
 
 // Sends message to tab to check if video is paused
 function videoPausedCheck(tab) {
-	chrome.runtime.onMessage.addListener(videoLoadedHandler);
+	browser.runtime.onMessage.addListener(videoLoadedHandler);
 	// Waits to receive message that foreground sends on load
 	function videoLoadedHandler(message, sender, sendResponse) {
 		if (message === "Video loaded") {
-			chrome.runtime.onMessage.removeListener(videoLoadedHandler);
-			chrome.tabs.sendMessage(tab.id, { message: "Is your tab's video playing?" }, (response) => {
+			browser.runtime.onMessage.removeListener(videoLoadedHandler);
+			browser.tabs.sendMessage(tab.id, { message: "Is your tab's video playing?" }, (response) => {
 				if (response === "No, you can run a script on the other window.") {
 					videoPausedFlag = true;
 				}
@@ -126,13 +130,13 @@ function VideoTabCheck(tab) {
 // ------------------- EVENT LISTENERS -----------------------
 
 // Sends command to first Youtube tab in the global tab list.
-chrome.commands.onCommand.addListener(
+browser.commands.onCommand.addListener(
 	(listener = (command) => {
 		// Commands will stack on top of each other if a timeoutFlag is not used
 		// Previous Video command only gets sent when on a YouTube page with a video (e.g. Not the homepage) or when on a Udemy quiz content page.
 		if ((command === "gPreviousVideo" && youtubeTabs[0].url.includes("youtube.com/watch")) || (command === "gPreviousVideo" && youtubeTabs[0].url.includes("/learn/quiz/"))) {
 			if (!timeoutFlag) {
-				chrome.tabs.goBack(youtubeTabs[0].id);
+				browser.tabs.goBack(youtubeTabs[0].id);
 				timeoutFlag = true;
 				setTimeout(() => {
 					timeoutFlag = false;
@@ -142,14 +146,14 @@ chrome.commands.onCommand.addListener(
 		if (!timeoutFlag) {
 			// Next Video command sends goForward browser-tab command instead of YouTube video "next" key command when not on a YouTube page with a video. (e.g. The homepage)
 			if (VideoTabCheck(youtubeTabs[0])) {
-				chrome.tabs.sendMessage(youtubeTabs[0].id, { message: command });
+				browser.tabs.sendMessage(youtubeTabs[0].id, { message: command });
 				console.log("You sent keydown", command, "to", youtubeTabs[0].id);
 				timeoutFlag = true;
 				setTimeout(() => {
 					timeoutFlag = false;
 				}, 20);
 			} else if (command === "fNextVideo" && youtubeTabs[0].url.includes("youtube.com")) {
-				chrome.tabs.goForward(youtubeTabs[0].id);
+				browser.tabs.goForward(youtubeTabs[0].id);
 				timeoutFlag = true;
 				setTimeout(() => {
 					timeoutFlag = false;
@@ -160,14 +164,14 @@ chrome.commands.onCommand.addListener(
 );
 
 // Runs start() again when any tab is updated
-chrome.tabs.onUpdated.addListener((id, changeInfo, updatedTab) => {
+browser.tabs.onUpdated.addListener((id, changeInfo, updatedTab) => {
 	if (!updateTimeoutFlag) {
 		// Ignores changes to tabs' audible property
 		if (changeInfo.audible != undefined) return;
 		if (changeInfo.status != "complete") return;
 
 		if (updatedTab.url.includes("udemy.com/course")) {
-			chrome.tabs.sendMessage(youtubeTabs[0].id, { message: "Refreshing" });
+			browser.tabs.sendMessage(youtubeTabs[0].id, { message: "Refreshing" });
 			console.log("SENDING MESSAGE ON REFRESH");
 		}
 
@@ -201,10 +205,10 @@ chrome.tabs.onUpdated.addListener((id, changeInfo, updatedTab) => {
 });
 
 // Ensures the tab furthest to the left is first index in array when the user rearranges tabs.
-chrome.tabs.onMoved.addListener((id, movedTab) => {
+browser.tabs.onMoved.addListener((id, movedTab) => {
 	// Needs timeoutFlag due to multiple tab moves being registered when a user rearranges tabs.
 	if (!timeoutFlag) {
-		chrome.tabs.get(id, (movedTab) => {
+		browser.tabs.get(id, (movedTab) => {
 			// Does the same thing as .onUpdated but when a tab is moved instead.
 			try {
 				if (movedTab.windowId === youtubeTabs[0].windowId || (VideoTabCheck(movedTab) && videoPausedFlag)) {
@@ -223,7 +227,7 @@ chrome.tabs.onMoved.addListener((id, movedTab) => {
 });
 
 // Runs start() when user un-pauses a video and changes videoPausedFlag accordingly.
-chrome.runtime.onMessage.addListener((videoPaused, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((videoPaused, sender, sendResponse) => {
 	if (typeof videoPaused !== "boolean") {
 		return;
 	}

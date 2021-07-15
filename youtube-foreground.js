@@ -1,8 +1,11 @@
+if (chrome) {
+	browser = chrome;
+}
 if (!window.scriptInjected) {
 	window.scriptInjected = true; //Prevents script from being run multiple times per tab
 
 	console.log("Script has been injected");
-	chrome.runtime.sendMessage("Video loaded");
+	browser.runtime.sendMessage("Video loaded");
 
 	video = document.querySelector("video");
 	videoParent = video.parentElement;
@@ -24,7 +27,7 @@ if (!window.scriptInjected) {
 	// Creates a MutationsObserver to monitor video DOM element
 	const observer = new MutationObserver((mutations) => {
 		// Mutations object used for debugging
-		chrome.runtime.sendMessage(video.paused);
+		browser.runtime.sendMessage(video.paused);
 	});
 	observer.observe(video, {
 		attributes: true,
@@ -101,7 +104,7 @@ if (!window.scriptInjected) {
 		},
 	};
 
-	chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
 		// Uses incoming message as a dynamic key to dispatch keypress or call command function
 		if (Object.keys(shortcuts).includes(request.message)) {
 			console.log("Command received: ", request.message);
@@ -114,7 +117,7 @@ if (!window.scriptInjected) {
 	});
 
 	// Prevents background.js from running scripts on other windows when video is still playing in current window.
-	chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
 		if (request.message === "Is your tab's video playing?") {
 			if (!video.paused) {
 				sendResponse("Yes, don't run a script on the other window yet.");

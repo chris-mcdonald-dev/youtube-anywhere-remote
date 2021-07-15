@@ -1,3 +1,6 @@
+if (chrome) {
+	browser = chrome;
+}
 initiate();
 
 function initiate() {
@@ -84,17 +87,17 @@ function showInfoOverlay(command) {
 
 function mainScript() {
 	console.log("Script has been injected");
-	chrome.runtime.sendMessage("Video loaded");
+	browser.runtime.sendMessage("Video loaded");
 
 	// All commands handled via the DOM
 	domElementCommands = {
 		aPausePlay: () => {
 			if (video.paused) {
 				video.play();
-				chrome.runtime.sendMessage(video.paused);
+				browser.runtime.sendMessage(video.paused);
 			} else {
 				video.pause();
-				chrome.runtime.sendMessage(video.paused);
+				browser.runtime.sendMessage(video.paused);
 			}
 		},
 		bRewind: () => {
@@ -183,7 +186,7 @@ function mainScript() {
 				video.playbackRate = playbackRateTemp;
 			}
 			/* -------------------------------- */
-			chrome.runtime.sendMessage(video.paused);
+			browser.runtime.sendMessage(video.paused);
 			playPauseTimeoutFlag = true;
 			playPauseTimeout = setTimeout(() => {
 				playPauseTimeoutFlag = false;
@@ -191,8 +194,8 @@ function mainScript() {
 		}
 	}
 
-	chrome.runtime.onMessage.addListener(commandHandler);
-	chrome.runtime.onMessage.addListener(refreshHandler);
+	browser.runtime.onMessage.addListener(commandHandler);
+	browser.runtime.onMessage.addListener(refreshHandler);
 
 	function commandHandler(request, sender, sendResponse) {
 		// Uses incoming message as a dynamic key to call command function
@@ -204,15 +207,15 @@ function mainScript() {
 
 	function refreshHandler(request, sender, sendResponse) {
 		if (request.message === "Refreshing") {
-			chrome.runtime.onMessage.removeListener(commandHandler);
+			browser.runtime.onMessage.removeListener(commandHandler);
 			window.scriptInjected = false;
 			// initiate();
-			chrome.runtime.onMessage.removeListener(refreshHandler);
+			browser.runtime.onMessage.removeListener(refreshHandler);
 		}
 	}
 
 	// Prevents background.js from running scripts on other windows when video is still playing in current window.
-	chrome.runtime.onMessage.addListener(videoPausedHandler);
+	browser.runtime.onMessage.addListener(videoPausedHandler);
 
 	function videoPausedHandler(request, sender, sendResponse) {
 		if (request.message === "Is your tab's video playing?") {
@@ -245,8 +248,8 @@ function mainTextScript() {
 		},
 	};
 
-	chrome.runtime.onMessage.addListener(commandHandler);
-	chrome.runtime.onMessage.addListener(refreshHandler);
+	browser.runtime.onMessage.addListener(commandHandler);
+	browser.runtime.onMessage.addListener(refreshHandler);
 
 	function commandHandler(request, sender, sendResponse) {
 		// Uses incoming message as a dynamic key to call command function
@@ -258,10 +261,10 @@ function mainTextScript() {
 
 	function refreshHandler(request, sender, sendResponse) {
 		if (request.message === "Refreshing") {
-			chrome.runtime.onMessage.removeListener(commandHandler);
+			browser.runtime.onMessage.removeListener(commandHandler);
 			window.scriptInjected = false;
 			// initiate();
-			chrome.runtime.onMessage.removeListener(refreshHandler);
+			browser.runtime.onMessage.removeListener(refreshHandler);
 		}
 	}
 }

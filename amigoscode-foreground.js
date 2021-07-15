@@ -1,3 +1,6 @@
+if (chrome) {
+	browser = chrome;
+}
 initiate();
 
 function initiate() {
@@ -76,7 +79,7 @@ function showInfoOverlay(command) {
 
 function mainScript() {
 	console.log("Script has been injected");
-	chrome.runtime.sendMessage("Video loaded");
+	browser.runtime.sendMessage("Video loaded");
 
 	// All commands handled via the DOM
 	domElementCommands = {
@@ -86,10 +89,10 @@ function mainScript() {
 			// }
 			if (video.paused) {
 				pauseElement.click();
-				chrome.runtime.sendMessage(video.paused);
+				browser.runtime.sendMessage(video.paused);
 			} else {
 				pauseElement.click();
-				chrome.runtime.sendMessage(video.paused);
+				browser.runtime.sendMessage(video.paused);
 			}
 		},
 		bRewind: () => {
@@ -160,15 +163,15 @@ function mainScript() {
 
 	// MutationObserver doesn't seem to work for every website's video attributes. Registers clicks on video container and sends state of video paused attribute instead.
 	pauseElement.addEventListener("click", () => {
-		chrome.runtime.sendMessage(video.paused);
+		browser.runtime.sendMessage(video.paused);
 	});
 
 	// Creates a MutationsObserver to monitor video DOM element
 	const observer = new MutationObserver((mutations) => {
 		// Restarts script if video 'src' changes
 		if (mutations[0].attributeName === "src") {
-			chrome.runtime.onMessage.removeListener(commandHandler);
-			chrome.runtime.onMessage.removeListener(videoPausedHandler);
+			browser.runtime.onMessage.removeListener(commandHandler);
+			browser.runtime.onMessage.removeListener(videoPausedHandler);
 			window.scriptInjected = false;
 			initiate();
 		}
@@ -183,7 +186,7 @@ function mainScript() {
 				video.playbackRate = playbackRateTemp;
 			}
 		}
-		chrome.runtime.sendMessage(video.paused);
+		browser.runtime.sendMessage(video.paused);
 	});
 
 	observer.observe(video.parentElement, {
@@ -193,7 +196,7 @@ function mainScript() {
 		attributeFilter: ["src"],
 	});
 
-	chrome.runtime.onMessage.addListener(commandHandler);
+	browser.runtime.onMessage.addListener(commandHandler);
 
 	function commandHandler(request, sender, sendResponse) {
 		// Uses incoming message as a dynamic key to call command function
@@ -204,7 +207,7 @@ function mainScript() {
 	}
 
 	// Prevents background.js from running scripts on other windows when video is still playing in current window.
-	chrome.runtime.onMessage.addListener(videoPausedHandler);
+	browser.runtime.onMessage.addListener(videoPausedHandler);
 
 	function videoPausedHandler(request, sender, sendResponse) {
 		if (request.message === "Is your tab's video playing?") {
