@@ -17,9 +17,7 @@ function start() {
 }
 
 function tabCheck(tab) {
-	if (tab.url.includes("youtube.com") || tab.url.includes("udemy.com") || tab.url.includes("amigoscode.com")) {
-		return true;
-	}
+	return tab.url.includes("youtube.com") || tab.url.includes("udemy.com") || tab.url.includes("amigoscode.com") || tab.url.includes("twitch.tv");
 }
 
 // Makes sure any YouTube tabs already open in any window are accounted for and executes main script when program first runs
@@ -85,6 +83,12 @@ function getAllTabs() {
 
 // Executes script on specified tab
 function executeScript(tab) {
+	if (tab.url.includes("twitch.tv")) {
+		chrome.tabs.executeScript(tab.id, { file: "./twitch-foreground.js" });
+		chrome.tabs.insertCSS(tab.id, { file: "./styles/info-overlay.css" });
+		console.log("Script executed on:", '"' + tab.title + '" ', "|  ID:", tab.id);
+	}
+
 	if (tab.url.includes("udemy.com/course")) {
 		browser.tabs.executeScript(tab.id, { file: "./udemy-foreground.js" });
 		browser.tabs.insertCSS(tab.id, { file: "./styles/info-overlay.css" });
@@ -122,9 +126,7 @@ function videoPausedCheck(tab) {
 
 // Checks if the tab is a known video page
 function VideoTabCheck(tab) {
-	if (tab.url.includes("youtube.com/watch") || tab.url.includes("udemy.com/course") || (tab.url.includes("amigoscode.com/courses") && tab.url.includes("lectures"))) {
-		return true;
-	}
+	return tab.url.includes("youtube.com/watch") || tab.url.includes("udemy.com/course") || (tab.url.includes("amigoscode.com/courses") && tab.url.includes("lectures")) || tab.url.includes("twitch.tv");
 }
 
 // ------------------- EVENT LISTENERS -----------------------

@@ -8,27 +8,32 @@
         "48": "assets/icon-48.png",
         "128": "assets/icon-128.png"
     },
-    "description": "YouTube Anywhere Remote allows you to control videos on YouTube, Udemy, and AmigosCode even while you're using other programs!",
+    "description": "YouTube Anywhere Remote allows you to control videos on YouTube, Udemy, AmigosCode, and Twitch even while you're using other programs!",
     "background": {
-        "scripts": ["./background.js"]
+        "scripts": [
+            "./background.js"
+        ]
     },
     "permissions": [
         "tabs",
         "https://*.youtube.com/*",
         "https://*.udemy.com/*",
-        "https://*.amigoscode.com/*"
+        "https://*.amigoscode.com/*",
+        "https://*.twitch.tv/*"
     ],
     "content_scripts": [
         {
             "matches": [
                 "http://*.youtube.com/*",
                 "http://*.udemy.com/*",
-                "http://*.amigoscode.com/*"
+                "http://*.amigoscode.com/*",
+                "http://*.twitch.tv/*"
             ],
             "js": [
                 "./youtube-foreground.js",
                 "./udemy-foreground.js",
-                "./amigoscode-foreground.js"
+                "./amigoscode-foreground.js",
+                "./twitch-foreground.js"
             ]
         }
     ],
@@ -37,7 +42,7 @@
             "description": "Pause/Play"
         },
         "bRewind": {
-          "description": "Rewind (5 Seconds)"
+            "description": "Rewind (5 Seconds)"
         },
         "cFastforward": {
             "description": "Fast-forward (5 Seconds)"
@@ -66,5 +71,5 @@
         "kSkipAd": {
             "description": "Skip Current Ad"
         }
-      }
+    }
 }
